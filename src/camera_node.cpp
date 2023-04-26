@@ -98,7 +98,7 @@ public:
         if (!initialized_) return;
 
         sensor_msgs::ImagePtr msg;
-        cv::Mat ram_mat(frame_width_, frame_height_, CV_8UC1, ram_image_);
+        cv::Mat ram_mat(frame_height_, frame_width_, CV_8UC1, ram_image_);
         unsigned int cnt;
 
         ROS_INFO("[CameraNode]: Running camera node...");
