@@ -26,6 +26,7 @@ catkin_package(
 
 add_library(devmem include/devmem/devmem.c)
 add_library(fpgaint_poll include/fpgaint_poll/fpgaint_poll.c)
+add_library(i2c include/i2c/i2c.c)
 
 include_directories(
   include
@@ -34,7 +35,7 @@ include_directories(
 
 add_executable(camera_node src/camera_node.cpp)
 
-target_link_libraries(camera_node ${catkin_LIBRARIES} devmem fpgaint_poll)
+target_link_libraries(camera_node ${catkin_LIBRARIES} devmem fpgaint_poll i2c)
 
 install(TARGETS camera_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

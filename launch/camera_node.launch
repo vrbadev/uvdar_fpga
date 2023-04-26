@@ -3,6 +3,14 @@
 <group ns="uvdar_fpga">
 
 <node name="camera_node" pkg="uvdar_fpga" type="camera_node" output="screen" >
+    <param name="i2c_dev" type="str" value="/dev/i2c-1" />
+    <param name="frame_width" type="int" value="752" />
+    <param name="frame_height" type="int" value="480" />
+    <param name="exposure_us" type="int" value="100" />
+    <param name="auto_exposure" type="bool" value="false" />
+    <param name="frame_ram_addr" type="int" value="1072693248" /> <!-- 0x3FF00000 -->
+    <param name="frame_vflip" type="bool" value="false" />
+    <param name="frame_hflip" type="bool" value="false" />
 </node>
 
 </group>
