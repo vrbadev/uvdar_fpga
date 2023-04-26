@@ -61,9 +61,9 @@ public:
             return;
         }
 
-        if (setFrameSize(frame_width_, frame_height_)) {
+        /*if (setFrameSize(frame_width_, frame_height_)) {
             ROS_WARN("[CameraNode]: Failed to configure camera: frame width and height!");
-        }
+        }*/
         if (setVerticalFlip(frame_vflip_)) {
             ROS_WARN("[CameraNode]: Failed to configure camera: vertical flip!");
         }
@@ -98,7 +98,7 @@ public:
         if (!initialized_) return;
 
         sensor_msgs::ImagePtr msg;
-        cv::Mat ram_mat;
+        cv::Mat ram_mat(frame_width_, frame_height_, CV_8UC1, ram_image_);
         unsigned int cnt;
 
         ROS_INFO("[CameraNode]: Running camera node...");
@@ -108,7 +108,6 @@ public:
                 if (cnt > 1) {
                     ROS_WARN("[CameraNode]: Missed %d frames (FPGA interrupts)!", cnt-1);
                 }
-                ram_mat = cv::Mat(frame_width_, frame_height_, CV_8UC1, ram_image_);
                 msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", ram_mat.clone()).toImageMsg();
                 pub_frames_.publish(msg);
             }
@@ -217,7 +216,9 @@ private:
         return true;
     };
 
-    bool setFrameSize(uint16_t width, uint16_t height) {
+    /*bool setFrameSize(uint16_t width, uint16_t height) {
+        // TODO: fix this function, when calling it with the default resolution (752x480), the FPS drops to about 45 FPS - why?
+        // also, changing frame size during runtime must be reflected in the DCMI interface design and changes must be propagated to the FPGA fabric (eg. through PIO)
         if ((width > MT9V034_MAX_WIDTH) || (height > MT9V034_MAX_HEIGHT)) {
             return true;
         }
@@ -257,7 +258,7 @@ private:
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_PIXEL_CLOCK, (read_mode_mul == 1) ? MT9V034_PIXEL_CLOCK_INV_PXL_CLK : 0);
 
         return (ret != 0);
-    };
+    };*/
 
     bool setVerticalFlip(bool enable) {
         uint16_t read_mode;
