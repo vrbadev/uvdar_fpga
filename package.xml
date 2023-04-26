@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>uvdar_fpga</name>
+  <version>0.0.0</version>
+  <description>Simple UVDAR-compatibility package for DE10-Nano (FPGA)</description>
+
+  <maintainer email="vrba.vojtech@fel.cvut.cz">Vojtech Vrba</maintainer>
+
+  <license>BSD 3-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>image_transport</depend>
+  <depend>cv_bridge</depend>
+  <depend>sensor_msgs</depend>
+  <depend>mrs_msgs</depend>
+
+</package>
+

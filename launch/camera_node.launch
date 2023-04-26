@@ -1,0 +1,11 @@
+<launch>
+
+<group ns="uvdar_fpga">
+
+<node name="camera_node" pkg="uvdar_fpga" type="camera_node" output="screen" >
+</node>
+
+</group>
+
+</launch>
+
