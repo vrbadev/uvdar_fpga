@@ -18,9 +18,15 @@
     <param name="frame_width" type="int" value="752" />
     <param name="frame_height" type="int" value="480" />
     <param name="detections_ram_addr" type="int" value="1071644672" /> <!-- 0x3FE00000 -->
+    <param name="control_fast_addr" type="int" value="-14680048" /> <!-- 0xFF200010 -->
     <param name="fpgaint_num" type="int" value="3" />
     <param name="concentrate_dist_px" type="double" value="5" />
     <param name="marker_sun_dist_px" type="double" value="8" />
+    <param name="fast_threshold" type="int" value="120" />
+    <param name="fast_threshold_diff" type="int" value="60" />
+    <param name="fast_threshold_sun" type="int" value="240" />
+    <param name="max_markers_count" type="int" value="30" />
+    <param name="max_sun_pts_count" type="int" value="6000" />
 </node>
 
 </group>

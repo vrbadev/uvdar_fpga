@@ -21,14 +21,14 @@ public:
         ROS_INFO("[CameraNode]: Initializing camera node...");
 
         nh.param<std::string>("i2c_dev", i2c_dev_, "/dev/i2c-1");
-        nh.param<int>("frame_width", frame_width_, MT9V034_MAX_WIDTH);
-        nh.param<int>("frame_height", frame_height_, MT9V034_MAX_HEIGHT);
-        nh.param<int>("exposure_us", exposure_us_, 100);
+        nh.param<int32_t>("frame_width", frame_width_, MT9V034_MAX_WIDTH);
+        nh.param<int32_t>("frame_height", frame_height_, MT9V034_MAX_HEIGHT);
+        nh.param<int32_t>("exposure_us", exposure_us_, 100);
         nh.param<bool>("auto_exposure", auto_exposure_, false);
-        nh.param<int>("frame_ram_addr", ram_frame_addr__, 0x3FB00000);
+        nh.param<int32_t>("frame_ram_addr", ram_frame_addr__, 0x3FB00000);
         nh.param<bool>("frame_vflip", frame_vflip_, false);
         nh.param<bool>("frame_hflip", frame_hflip_, false);
-        nh.param<int>("fpgaint_num", fpgaint_num_, 0);
+        nh.param<int32_t>("fpgaint_num", fpgaint_num_, 0);
 
         serv_set_exposure_us_ = nh.advertiseService("set_exposure_us", &CameraNode::callbackSetExposureUs, this);
         serv_set_auto_exposure_ = nh.advertiseService("set_auto_exposure", &CameraNode::callbackSetAutoExposure, this);
@@ -80,7 +80,7 @@ public:
 
         initialized_ = true;
 
-        ROS_INFO("[CameraNode]: Camera node initialized_.");
+        ROS_INFO("[CameraNode]: Camera node initialized.");
     };
 
     ~CameraNode() {
@@ -100,7 +100,7 @@ public:
 
         sensor_msgs::ImagePtr msg;
         cv::Mat ram_mat(frame_height_, frame_width_, CV_8UC1, ram_image_);
-        unsigned int cnt;
+        uint32_t cnt;
 
         ROS_INFO("[CameraNode]: Running camera node...");
 
@@ -127,16 +127,16 @@ private:
 
     fpgaint_poll_t fpgaint_poll_;
     i2c_handle_t i2c_handle_;
-    int ram_image_fd_;
+    int32_t ram_image_fd_;
     uint8_t* ram_image_;
 
-    int ram_frame_addr__;
+    int32_t ram_frame_addr__;
     std::string i2c_dev_;
-    int frame_width_, frame_height_;
-    int exposure_us_;
+    int32_t frame_width_, frame_height_;
+    int32_t exposure_us_;
     bool auto_exposure_;
     bool frame_vflip_, frame_hflip_;
-    int fpgaint_num_;
+    int32_t fpgaint_num_;
 
     bool callbackSetAutoExposure(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res) {
         if (!initialized_) {
@@ -206,11 +206,11 @@ private:
 
         exposure_us_ = req.value;
         if (setAutoExposure(auto_exposure_, exposure_us_)) {
-            res.message = std::string("Failed to set exposure time to: "+ std::to_string((int) (exposure_us_)) + " us!").c_str();
+            res.message = std::string("Failed to set exposure time to: "+ std::to_string((int32_t) (exposure_us_)) + " us!").c_str();
             res.success = false;
             ROS_ERROR_STREAM("[CameraNode]: " << res.message);
         } else {
-            res.message = std::string("Setting exposure time to: "+ std::to_string((int) (exposure_us_)) + " us").c_str();
+            res.message = std::string("Setting exposure time to: "+ std::to_string((int32_t) (exposure_us_)) + " us").c_str();
             res.success = true;
             ROS_INFO_STREAM("[CameraNode]: " << res.message);
         }
@@ -230,7 +230,7 @@ private:
             return true;
         }
 
-        int read_mode_mul = 1;
+        int32_t read_mode_mul = 1;
         read_mode &= 0xFFF0;
 
         if ((width <= (MT9V034_MAX_WIDTH / 4)) && (height <= (MT9V034_MAX_HEIGHT / 4))) {
@@ -241,8 +241,8 @@ private:
             read_mode |= MT9V034_READ_MODE_COL_BIN_2 | MT9V034_READ_MODE_ROW_BIN_2;
         }
 
-        int ret = 0;
-        int val;
+        int32_t ret = 0;
+        int32_t val;
 
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_COL_START, ((MT9V034_MAX_WIDTH - (width * read_mode_mul)) / 2) + MT9V034_COL_START_MIN);
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_ROW_START, ((MT9V034_MAX_HEIGHT - (height * read_mode_mul)) / 2) + MT9V034_ROW_START_MIN);
@@ -264,7 +264,7 @@ private:
 
     bool setVerticalFlip(bool enable) {
         uint16_t read_mode;
-        int ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_READ_MODE, &read_mode);
+        int32_t ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_READ_MODE, &read_mode);
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_READ_MODE, (read_mode & (~MT9V034_READ_MODE_ROW_FLIP)) | ((!enable) ? MT9V034_READ_MODE_ROW_FLIP : 0));
 
         return (ret != 0);
@@ -272,27 +272,27 @@ private:
 
     bool setHorizontalFlip(bool enable) {
         uint16_t read_mode;
-        int ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_READ_MODE, &read_mode);
+        int32_t ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_READ_MODE, &read_mode);
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_READ_MODE, (read_mode & (~MT9V034_READ_MODE_COL_FLIP)) | ((!enable) ? MT9V034_READ_MODE_COL_FLIP : 0));
 
         return (ret != 0);
     };
 
-    bool setAutoExposure(bool enable, int exposure_us) {
+    bool setAutoExposure(bool enable, int32_t exposure_us) {
         uint16_t reg, row_time_0, row_time_1;
-        int ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_AEC_AGC_ENABLE, &reg);
+        int32_t ret = i2c_read_reg_u16(&i2c_handle_, MT9V034_AEC_AGC_ENABLE, &reg);
         ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_AEC_AGC_ENABLE, (reg & (~MT9V034_AEC_ENABLE)) | ((enable != 0) ? MT9V034_AEC_ENABLE : 0));
 
         if ((enable == 0) && (exposure_us >= 0)) {
             ret |= i2c_read_reg_u16(&i2c_handle_, MT9V034_WINDOW_WIDTH, &row_time_0);
             ret |= i2c_read_reg_u16(&i2c_handle_, MT9V034_HORIZONTAL_BLANKING, &row_time_1);
 
-            int exposure = MICROSECOND_CLKS / 2; 
+            int32_t exposure = MICROSECOND_CLKS / 2; 
             if (exposure_us < exposure) exposure = exposure_us;
             exposure *= (MT9V034_XCLK_FREQ / MICROSECOND_CLKS);
-            int row_time = row_time_0 + row_time_1;
-            int coarse_time = exposure / row_time;
-            int fine_time = exposure % row_time;
+            int32_t row_time = row_time_0 + row_time_1;
+            int32_t coarse_time = exposure / row_time;
+            int32_t fine_time = exposure % row_time;
 
             ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_TOTAL_SHUTTER_WIDTH, coarse_time);
             ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_FINE_SHUTTER_WIDTH_TOTAL, fine_time);
@@ -300,11 +300,11 @@ private:
             ret |= i2c_read_reg_u16(&i2c_handle_, MT9V034_WINDOW_WIDTH, &row_time_0);
             ret |= i2c_read_reg_u16(&i2c_handle_, MT9V034_HORIZONTAL_BLANKING, &row_time_1);
 
-            int exposure = MICROSECOND_CLKS / 2;
+            int32_t exposure = MICROSECOND_CLKS / 2;
             if (exposure_us < exposure) exposure = exposure_us;
             exposure *= (MT9V034_XCLK_FREQ / MICROSECOND_CLKS);
-            int row_time = row_time_0 + row_time_1;
-            int coarse_time = exposure / row_time;
+            int32_t row_time = row_time_0 + row_time_1;
+            int32_t coarse_time = exposure / row_time;
 
             ret |= i2c_write_reg_u16(&i2c_handle_, MT9V034_MAX_EXPOSE, coarse_time);
         }
@@ -314,7 +314,7 @@ private:
 };
 
 
-int main(int argc, char** argv) {
+int32_t main(int32_t argc, char** argv) {
     ros::init(argc, argv, "camera_node");
 
     ros::NodeHandle nh("~");
