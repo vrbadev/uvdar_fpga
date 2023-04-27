@@ -7,8 +7,8 @@ FILE(GLOB_RECURSE YAML_FILES include *.yaml)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -Wall -Wextra")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -std=c++17 -g -Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g -Wall -Wextra -Wno-psabi")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -std=c++17 -g -Wall -Wextra -Wno-psabi -O3")
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -34,10 +34,12 @@ include_directories(
 )
 
 add_executable(camera_node src/camera_node.cpp)
+add_executable(detector_node src/detector_node.cpp)
 
 target_link_libraries(camera_node ${catkin_LIBRARIES} devmem fpgaint_poll i2c)
+target_link_libraries(detector_node ${catkin_LIBRARIES} devmem fpgaint_poll)
 
-install(TARGETS camera_node
+install(TARGETS camera_node detector_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

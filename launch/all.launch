@@ -14,6 +14,15 @@
     <param name="fpgaint_num" type="int" value="0" />
 </node>
 
+<node name="detector_node" pkg="uvdar_fpga" type="detector_node" output="screen" >
+    <param name="frame_width" type="int" value="752" />
+    <param name="frame_height" type="int" value="480" />
+    <param name="detections_ram_addr" type="int" value="1071644672" /> <!-- 0x3FE00000 -->
+    <param name="fpgaint_num" type="int" value="3" />
+    <param name="concentrate_dist_px" type="double" value="5" />
+    <param name="marker_sun_dist_px" type="double" value="8" />
+</node>
+
 </group>
 
 </launch>

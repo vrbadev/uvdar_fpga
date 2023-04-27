@@ -25,9 +25,10 @@ public:
         nh.param<int>("frame_height", frame_height_, MT9V034_MAX_HEIGHT);
         nh.param<int>("exposure_us", exposure_us_, 100);
         nh.param<bool>("auto_exposure", auto_exposure_, false);
-        nh.param<int>("frame_ram_addr", frame_ram_addr_, 0x3FF00000);
+        nh.param<int>("frame_ram_addr", ram_frame_addr__, 0x3FB00000);
         nh.param<bool>("frame_vflip", frame_vflip_, false);
         nh.param<bool>("frame_hflip", frame_hflip_, false);
+        nh.param<int>("fpgaint_num", fpgaint_num_, 0);
 
         serv_set_exposure_us_ = nh.advertiseService("set_exposure_us", &CameraNode::callbackSetExposureUs, this);
         serv_set_auto_exposure_ = nh.advertiseService("set_auto_exposure", &CameraNode::callbackSetAutoExposure, this);
@@ -50,14 +51,14 @@ public:
             return;
         }
 
-        fpgaint_poll_ = FPGAINT_POLL_NEW(0);
+        fpgaint_poll_ = FPGAINT_POLL_NEW(fpgaint_num_);
         if (!fpgaint_poll_init(&fpgaint_poll_)) {
             ROS_ERROR("[CameraNode]: File to initialize FPGA interrupt poll!");
             return;
         }
 
-        if ((ram_image_fd_ = devmem_map(frame_ram_addr_, frame_width_*frame_height_, (void**) &ram_image_)) <= 0) {
-            ROS_ERROR("[CameraNode]: Mapping of 0x%08X failed with code %d\r\n!", frame_ram_addr_, ram_image_fd_);
+        if ((ram_image_fd_ = devmem_map(ram_frame_addr__, frame_width_*frame_height_, (void**) &ram_image_)) <= 0) {
+            ROS_ERROR("[CameraNode]: Mapping of 0x%08X failed with code %d\r\n!", ram_frame_addr__, ram_image_fd_);
             return;
         }
 
@@ -90,7 +91,7 @@ public:
         fpgaint_poll_deinit(&fpgaint_poll_);
 
         if (ram_image_fd_ > 0 && (ram_image_fd_ = devmem_unmap(ram_image_fd_, (void*) ram_image_, frame_width_*frame_height_))) {
-            ROS_ERROR("[CameraNode]: Unmapping of 0x%08X failed with code %d\r\n!", frame_ram_addr_, ram_image_fd_);
+            ROS_ERROR("[CameraNode]: Unmapping of 0x%08X failed with code %d\r\n!", ram_frame_addr__, ram_image_fd_);
         }
     };
 
@@ -129,12 +130,13 @@ private:
     int ram_image_fd_;
     uint8_t* ram_image_;
 
+    int ram_frame_addr__;
     std::string i2c_dev_;
     int frame_width_, frame_height_;
     int exposure_us_;
     bool auto_exposure_;
-    int frame_ram_addr_;
     bool frame_vflip_, frame_hflip_;
+    int fpgaint_num_;
 
     bool callbackSetAutoExposure(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res) {
         if (!initialized_) {
