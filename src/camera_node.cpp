@@ -25,7 +25,7 @@ public:
         nh.param<int32_t>("frame_height", frame_height_, MT9V034_MAX_HEIGHT);
         nh.param<int32_t>("exposure_us", exposure_us_, 100);
         nh.param<bool>("auto_exposure", auto_exposure_, false);
-        nh.param<int32_t>("frame_ram_addr", ram_frame_addr__, 0x3FB00000);
+        nh.param<int32_t>("frame_ram_addr", ram_frame_addr__, 0x3FC00000);
         nh.param<bool>("frame_vflip", frame_vflip_, false);
         nh.param<bool>("frame_hflip", frame_hflip_, false);
         nh.param<int32_t>("fpgaint_num", fpgaint_num_, 0);

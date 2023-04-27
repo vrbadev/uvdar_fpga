@@ -8,7 +8,7 @@
     <param name="frame_height" type="int" value="480" />
     <param name="exposure_us" type="int" value="500" />
     <param name="auto_exposure" type="bool" value="false" />
-    <param name="frame_ram_addr" type="int" value="1068498944" /> <!-- 0x3FB00000 -->
+    <param name="frame_ram_addr" type="int" value="1069547520" /> <!-- 0x3FC00000 -->
     <param name="frame_vflip" type="bool" value="false" />
     <param name="frame_hflip" type="bool" value="false" />
     <param name="fpgaint_num" type="int" value="0" />
